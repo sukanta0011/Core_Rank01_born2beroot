@@ -80,3 +80,77 @@ Other mode like Bride Adapter is used in real server, where VM act as seperate u
 - Device for bootloader installation: /dev/sda
 
 Now the OS is successfully installed. Press continue too reboot. Provide the passkey first. Then user id and Password (not the Host name and password).
+
+## After First Login
+<details>
+<summary>APT</summary>
+<br>
+Advance Package Tool, the app store of Debian, it connect to the server we selected during installation and download and install the software.
+<br>
+apt update, download the latest version available.
+<br>
+apt install "name", install the software.
+</details>
+
+<details>
+<summary>SU</summary>
+<br>
+su (Substitute User), it allow to swith identity entirely with the target, we need to provide the target password. only **su** allow you to be root if you know root password. On success, it allow you to stay root unless you type **exit**.
+<br>
+Risk: once you root, if you delete anything, there will be no record who deleated it.
+</details>
+
+<details>
+<summary>SUDO</summary>
+<br>
+sudo (SuperUser DO), it allow the normal user to borrow the power of root temporarily, you need to provide the password but it is you password not the root password.
+<br>
+Whatever you do with sudo user power, the system will generate a log telling who used the command at which time. Once the command executed, you are out of root user previllage.
+</details>
+- Right now, the system does not have any fire wall, wrong SSH port and sudo not install.
+
+if you are not logged in as root, use "su" and the root user password to switch to root
+```bash
+apt update && apt install sudo
+```
+
+But the user do not have the power to use it yet. You need to add the user to the sudo group.
+
+To check available user you can use
+```bash
+ls /home
+```
+add user to the the sudo group
+```bash
+adduser username sudo
+```
+If you get error like adduser command not found, either you can use full path /usr/sbin/adduser or you can exit and use "su -" to have root access with correct path.
+to varify if the user is added or not use
+```bash
+getent group sudo
+```
+it wil show sudo: x : 27 : user -> group name : password placeholder : group id : user list
+
+once done, type reboot to reboot the system and login as a normal user and check if the user still is in sudo group or not. You can use following command
+```bash
+sudo whoami
+```
+you will get reponse as: root.
+
+## Setting up SSH
+<details>
+<summary>SSH</summary>
+<br>
+Secure Shell
+<br>
+</details>
+
+Use the following command to check if the SSH is active
+```bash
+sudo service ssh status
+sudo systemctl status ssh
+
+sudo systemctl stop ssh -> stop ssh connection
+sudo systemctl start ssh -> start ssh connection
+```
+On success, it will return Active: active (running) in green, press q to exit.
