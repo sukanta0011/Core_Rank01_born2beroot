@@ -154,3 +154,64 @@ sudo systemctl stop ssh -> stop ssh connection
 sudo systemctl start ssh -> start ssh connection
 ```
 On success, it will return Active: active (running) in green, press q to exit.
+
+We need to edit the port number from 22 to 4242, we need to open the file /etc/ssh/sshd_config using 
+```bash
+sudo nano sshd_config
+```
+Change the port from 22 to 4242 and change the PermitRootLogin no.
+
+<details>
+<summary>Why Prevent Root login?</summary>
+<br>
+If someone tries to hack the system using ssh, they need to come up with the user id and password, but for root user the id is by default "root" which make the hacking process 50% easier.
+</details>
+
+Once done, use the following command to restart the ssh
+```bash
+sudo service ssh restart
+```
+After the restart, open the terminal on your pc and use the following command to get access to the VM using SSH
+```bash
+ssh -p 4242 username@127.0.0.1
+```
+In case there is any problem, go the VirtualBox and open the settings, go to Expert>Network>Adapter1>PortForwarding if there is no port forwarding rule set, click on add and use Host IP: 127.0.0.1, Host Port: 4242 and Guest Port: 4242 and restart the VM.
+
+## Setting up the Firewall
+
+<details>
+<summary>Firewall (UFW)</summary>
+<br>
+Right now, our server accepts connections from anyone on any port (In VirtualBox since port forwarding is set only for 4242, others will not work, but still the VM is listening for other ports. Firewall is like a getkeeper, once we instruct it to allow certain ports, it will only allow them and block the rest.
+<br>
+<br>
+Firewall Hierarchy
+<br>
+Netfilter: This resides inside the Linux Kernel
+<br>
+iptable: This is used by experts who talk to the Netfilter directly, but very complicated.
+<br>
+UFW: It's just a wrapper, makes the communication with iptables simple.
+</details>
+
+First we should setup the port forwarding and then the firewall, otherwise we might lock ourself.
+Follow the commands
+```bash
+sudo apt install ufw -> install UFW(Uncomplicated Firewall)
+sudo ufw allow 4242 -> allow port 4242
+sudo ufw enable -> use y to start the firewall
+sudo ufw status -> check the status
+```
+Other useful commands
+```bash
+sudo ufw disable -> stop firewall
+sudo ufw deny 4242 -> block 4242
+```
+
+## Updating the sudo
+:warning: To edit anything in sudo, always use visudo. This open the sudo file with nano or vim editor, but before saving the file, it checks all the commands and grammar; if it sees any problem, it does not allow you to save the file because any mistake in sudo can crash the system.
+
+use the following commands
+```bash
+sudo visudo -> opens the file in /etc/sodoers.d
+```
