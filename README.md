@@ -211,7 +211,33 @@ sudo ufw deny 4242 -> block 4242
 ## Updating the sudo
 :warning: To edit anything in sudo, always use visudo. This open the sudo file with nano or vim editor, but before saving the file, it checks all the commands and grammar; if it sees any problem, it does not allow you to save the file because any mistake in sudo can crash the system.
 
-use the following commands
+use the following commands to edit the sudoers file
 ```bash
-sudo visudo -> opens the file in /etc/sodoers.d
+sudo visudo
+```
+once open, paste the following text in the sudoers file to configure the sudo
+
+```txt
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+Defaults        passwd_tries=2
+Defaults        badpass_message="Your password is wrong!!"
+Defaults        logfile="/var/log/sudo/sudo.log"
+Defaults        log_input
+Defaults        log_output
+Defaults        iolog_dir="/var/log/sudo"
+Defaults        requiretty
+```
+- secure_path: already exists in the sudo file, just add the new paths
+- passwd_tries: number of time user can retry to get sudo user access if password is wrong.
+- badpass: message shows to the user after every wrong password.
+- logfile: path where all the sudo related logs are saved.
+- log_input: (on), it is additional level of information stored in the iolog_dir. It records everything that was typed in the terminal during the sudo session.
+- log_output: (on), It records everything that was displayed on the terminal during the sudo session.
+- iolog_dir: path where these additional informations are saved.
+- requiredtty: this ensures commanded are typed by opening some terminal, this is kind of bot protection.
+all the commands are available in the man page of sudoers.
+```bash
+man sudoers
+/search_string -> to search any matching string in the man page.
+n -> to go to the next matching string.
 ```
