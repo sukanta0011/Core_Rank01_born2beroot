@@ -241,3 +241,20 @@ man sudoers
 /search_string -> to search any matching string in the man page.
 n -> to go to the next matching string.
 ```
+## Updating password policies
+
+The password policy required by the subject need you to modify two file
+1. File which handles password aging.
+2. File that handle complex password.
+### Password aging settings
+You can try following command to find all the files related to logging
+```bash
+find \etc -name "*login*"
+```
+The file we need to modify is: \etc\login.defs. Then look for the Password aging controls.
+```txt
+# Password aging controls:
+PASS_MAX_DAYS   30
+PASS_MIN_DAYS   2
+PASS_WARN_AGE   7
+```
