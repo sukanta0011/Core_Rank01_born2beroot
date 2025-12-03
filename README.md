@@ -227,7 +227,7 @@ Defaults        log_output
 Defaults        iolog_dir="/var/log/sudo"
 Defaults        requiretty
 ```
-- secure_path: already exists in the sudo file, just add the new paths
+- secure_path: already exists in the sudo file, just add the new paths. Secure paths are the paths where sudo looks for binary to exeute.
 - passwd_tries: number of time user can retry to get sudo user access if password is wrong.
 - badpass: message shows to the user after every wrong password.
 - logfile: path where all the sudo related logs are saved.
@@ -245,7 +245,7 @@ n -> to go to the next matching string.
 
 The password policy required by the subject need you to modify two file
 1. File which handles password aging.
-2. File that handle complex password.
+2. File that handle complex password (password quality).
 ### Password aging settings
 You can try following command to find all the files related to logging
 ```bash
@@ -257,4 +257,27 @@ The file we need to modify is: \etc\login.defs. Then look for the Password aging
 PASS_MAX_DAYS   30
 PASS_MIN_DAYS   2
 PASS_WARN_AGE   7
+```
+
+### Password quality check
+Linux authentication uses a system call PAM(pluggable Authentication Modules). When we type a password it checks all the modules to see the rules and is the password passes all the rules. In etc/pam.d/common-password, the pre installed module is pam_unix.so, but it can not handle the complex password requirement of the subject. We need to install additional module.
+
+use the following command to search for modules
+```bash
+apt search password quality
+```
+there will be one result libpam-pwquality, we need to install that. once installed, in the "common-password" file you will see another module pam_pwquality.so retry=3, remove the retry=3. Go to etc/security/ there will be pwquality.conf file. edit it with the following parameters.
+```txt
+difok = 7
+minlen = 10
+dcredit = -1
+ucredit = -1
+lcredit = -1
+maxrepeat = 3
+usercheck = 1
+enforce_for_root
+```
+now you can crete a testuser to check if the password policy is correctly applied or not.
+```bash
+sudo adduser testuser
 ```
