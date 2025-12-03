@@ -281,3 +281,57 @@ now you can crete a testuser to check if the password policy is correctly applie
 ```bash
 sudo adduser testuser
 ```
+
+## Monitoring.sh
+use the following command to search for required binaries
+```bash
+apropos search_string
+ex. apropos ls
+```
+kernel version is located at /proc/sys/kernel/version
+uname -a ->display all system information
+cpu number: /proc/cpuinfo
+cat /proc/cpuinfo | grep "cpu cores"
+for memory -> free -m
+disk usages -> df
+
+```sh
+#!/bin/bash
+
+#The architecture of your operating system and its kernel version
+echo "#Architecture:"
+uname -a
+
+#The number of physical processors
+cat /proc/cpuinfo | grep "cpu cores"
+
+#The number of virtual processors
+cat /proc/cpuinfo | grep "cpu cores"
+
+#The current available RAM on your server and its utilization rate as a percentage
+free -m | grep Mem | awk '{print $3 "/" $2 "MB" "(" $3*100/$2 "%)"}'
+
+#The current available storage on your server and its utilization rate as a percentage
+df -h | grep home | awk '{print $3 "/" $2 " ("$5")"}'
+
+#The current utilization rate of your processors as a percentage
+
+
+#The date and time of the last reboot
+journalctl -q --list-boots
+who -b | awk '{print $3 " " $4}'
+
+#Whether LVM is active or not
+
+
+#The number of active connections
+ss -t | grep ESTAB | wc -l
+
+#The number of users using the server
+
+
+#The IPv4 address of your server and its MAC (Media Access Control) address
+
+
+#The number of commands executed with the sudo program
+```
