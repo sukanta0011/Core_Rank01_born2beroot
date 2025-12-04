@@ -288,50 +288,62 @@ use the following command to search for required binaries
 apropos search_string
 ex. apropos ls
 ```
-kernel version is located at /proc/sys/kernel/version
-uname -a ->display all system information
-cpu number: /proc/cpuinfo
-cat /proc/cpuinfo | grep "cpu cores"
-for memory -> free -m
-disk usages -> df
 
 ```sh
 #!/bin/bash
 
 #The architecture of your operating system and its kernel version
-echo "#Architecture:"
-uname -a
+arch=$(uname -a)
 
 #The number of physical processors
-cat /proc/cpuinfo | grep "cpu cores"
+cpu=$(grep "physical id" /proc/cpuinfo | uniq | wc -l)
 
 #The number of virtual processors
-cat /proc/cpuinfo | grep "cpu cores"
+vcpu=$(grep "processor" /proc/cpuinfo | wc -l)
 
 #The current available RAM on your server and its utilization rate as a percentage
-free -m | grep Mem | awk '{print $3 "/" $2 "MB" "(" $3*100/$2 "%)"}'
+mem_used=$(free -m | grep Mem | awk '{print $3}')
+mem_total=$(free -m | grep Mem | awk '{print $2}')
+mem_perc=$(free -m | grep Mem | awk '{printf("%.2f"), $3*100/$2}')
 
 #The current available storage on your server and its utilization rate as a percentage
-df -h | grep home | awk '{print $3 "/" $2 " ("$5")"}'
+disk=$(df -m | grep home | awk '{print $3 "/" $2 "MB ("$5")"}')
 
 #The current utilization rate of your processors as a percentage
-
+proc_load=$(top -bn1 | grep Cpu | awk '{printf("%.1f"), $2+$4}')
 
 #The date and time of the last reboot
-journalctl -q --list-boots
-who -b | awk '{print $3 " " $4}'
+last_boot=$(who -b | awk '{print $3 " " $4}')
 
 #Whether LVM is active or not
-
+lvm=$(lsblk | grep lvm | wc -l)
+is_lvm=$(if [ $lvm -gt 0 ]; then echo yes; else echo no; fi)
 
 #The number of active connections
-ss -t | grep ESTAB | wc -l
+tcp_conn=$(ss -ta | grep ESTAB | wc -l)
 
 #The number of users using the server
-
+users=$(users | wc -w)
 
 #The IPv4 address of your server and its MAC (Media Access Control) address
-
+ip=$(hostname -I | awk '{print $1}')
+mac=$(ip address | grep "link/ether" | awk '{print $2}')
 
 #The number of commands executed with the sudo program
+sudo_cmds=$(journalctl -q | grep sudo | grep COMMAND | wc -l)
+
+#-----------------------Broadcast----------------------------
+wall "
+#Architecture: $arch
+#CPU physical: $cpu
+#vCPU: $vcpu
+#Memory Usage: ${mem_used}/${mem_used}MB (${mem_perc}%)
+#Disk Usage: $disk
+#CPU load: $proc_load
+#Last boot: $last_boot
+#LVM use: $is_lvm
+#Connections TCP: $tcp_conn ESTABLISHED
+#User log: $users
+#Network: IP $ip ($mac)
+#Sudo : $sudo_cmds cmd"
 ```
