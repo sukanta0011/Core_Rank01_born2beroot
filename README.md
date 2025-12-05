@@ -347,3 +347,41 @@ wall "
 #Network: IP $ip ($mac)
 #Sudo : $sudo_cmds cmd"
 ```
+
+## Bonus
+### Setting up the partitions
+Follow the tutorial: https://noreply.gitbook.io/born2beroot/bonus-services/litespeed
+
+### Setting up WordPress
+Follow the tutorial: https://noreply.gitbook.io/born2beroot/bonus-services/litespeed
+
+If port 80 does not work, try to open port 8080. In the VB, add port forwarding with hostport:8080 and guest port:80
+
+### Additional service fail2ban
+Fail2Ban can be used to block an IP address for a specified amount of time if the user tries to SSH with the wrong password for more than a specified number of times.
+
+```bash
+apt install fail2ban -> install the service
+```
+Go to the /etc/fail2ban
+Copy the jail.conf file to jail.local file because upon version update of fail2ban, the conf file will be overwritten and the setting will be lost. Suddenly, you lost the security of the SSH login.
+```bash
+cp jail.conf jail.local
+sudo nano jail.local
+```
+Look for the section [sshd]
+```txt
+enable  = true -> enable sshd look up
+port    = 4242 -> ssh port
+filter  = sshd -> filter the files by sshd
+maxretry  = 3
+bantime = 600 -> 10min
+banaction = ufw
+```
+If the banaction is not set, the UFW overwrites the fail2ban command.
+```bash
+sudo service fail2ban restart -> restart after configuration
+sudo fail2ban-client -i
+status sshd -> to check the banned service
+set sshd unbanip ip_address -> remove the ban
+```
